@@ -1,25 +1,35 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
-
+import React, { useState, useEffect } from 'react';
+import List from './components/List';
 function App() {
+  const [data, setData] = useState('')
+
+  useEffect(() => {
+    fetch('http://localhost:8000/raminder-birthday')
+      .then(res => res.json())
+      .then(data => {
+        setData(handlerAge(data))
+
+      })
+  }, [])
+
+
+const handlerAge = (data) => {
+  if(data.length > 0){
+    return data.map(el => {
+      let age = new Date().getFullYear() - new Date(el.birthday.split("/")[2]).getFullYear();
+      return {...el,age} 
+    })
+  }
+}
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <main>
+      <section className="container">
+        <h3>{data.length} birthdays today</h3>
+        {data && <List data={data} />}
+        <button onClick={() => setData([])}>clear all</button>
+      </section>
+    </main>
   );
 }
 
